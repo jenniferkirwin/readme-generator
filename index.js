@@ -2,6 +2,11 @@ const fs = require("fs");
 const axious = require("axios");
 const inquirer = require("inquirer");
 
+let userBio;
+let userImg;
+let userEmail;
+
+
 function askUserInfo() {
     return new Promise((resolve, reject) => {
         inquirer
@@ -21,11 +26,13 @@ function getUserInfo(userName) {
 
     axious.get(`https://api.github.com/users/${userName}`)
     .then(function(response) {
-        // console.log(response);
         console.log(`User "${userName}" has been found!`);
+        //console.log(response);
+        console.log(response.data.bio);
+        userBio = response.data.bio;
+        userImg = response.data.avatar_url;
+        userEmail = response.data.email;
     }).catch(function (error) {
-        // console.log(error);
-        // console.log(`User "${userName}" not found.`);
         inquirer.prompt([
             {
                 type: `confirm`,
@@ -44,7 +51,55 @@ function getUserInfo(userName) {
 
 };
 
+function getProjectInfo() {
+    return new Promise((resolve, reject) => {
 
+        inquirer
+            .prompt([
+                {
+                    type: `input`,
+                    message: `Project Title:\n`,
+                    name: `projectTitle`
+                },
+                {
+                    type: `input`,
+                    message: `Project Description (2-3 sentences):\n`,
+                    name: `projectDescription`
+                },
+                {
+                    type: `input`,
+                    message: `How is this project installed?\n`,
+                    name: `projectInstall`
+                },
+                {
+                    type: `input`,
+                    message: `How is this project used?\n`,
+                    name: `projectUsage` 
+                },
+                {
+                    type:`list`,
+                    name: `projectLicense`,
+                    message: `What is the License on your project?`,
+                    choices: [`None`, `Apache License 2.0`, `GNU General Public License v3.0`,`MIT License`, `BSD 2-Clause "Simplified" License`, `BSD 3-Clause "New" or "Revised" License`, `Creative Commons Zero v1.0 Universal`, `Eclipse Public License 2.0`, `GNU Affero General Public License v3.0`, `GNU General Public License v2.0`, `GNU Lesser General Public License v2.1`, `GNU Lesser General Public License v3.0`, `Mozilla Public License 2.0`, `The Unlicense`]
+                    
+                },
+                {
+                    type: `input`,
+                    name: `projectTesting`,
+                    message: `Any testing you did that you woud like included in your readme.md?`
+                },
+                {
+                    type: `input`,
+                    name: `additionalCollab`,
+                    message: `Any other collaborators on your project?`
+                }
+            ]).then((answers) => {
+                console.log(answers);
+            })
+    });    
+};
+
+askUserInfo();
 
  `
  # Project Title
