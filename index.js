@@ -2,11 +2,9 @@ const fs = require("fs");
 const axious = require("axios");
 const inquirer = require("inquirer");
 
-let entrUserName;
 let userBio;
 let userImg;
 let userEmail;
-let repoInfo;
 let readMe;
 
 
@@ -33,6 +31,7 @@ function getUserInfo(userName) {
             userBio = response.data.bio;
             userImg = response.data.avatar_url;
             userEmail = response.data.email;
+            console.log(response);
         }).catch(function (error) {
             console.log(`\nUser "${userName}" not found. Please try again.\n`);
             process.exit(1);
