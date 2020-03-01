@@ -2,51 +2,40 @@ const fs = require("fs");
 const axious = require("axios");
 const inquirer = require("inquirer");
 
+let entrUserName;
 let userBio;
 let userImg;
 let userEmail;
+let repoInfo;
+const readMe;
 
 
-function askUserInfo() {
+function askUserName() {
     return new Promise((resolve, reject) => {
         inquirer
             .prompt([
                 {
                     type: `input`,
-                    message: `What is your GitHub user name?\n`,
+                    message: `\n-------------------------------------------------\nWhat is your GitHub user name?\n-------------------------------------------------\n`,
                     name: `githubUser`,
                 }
             ]).then(({githubUser}) => {
-                getUserInfo(githubUser);
+                return resolve(githubUser);
             });
-    })
-}
+    });
+};
 
 function getUserInfo(userName) {
 
-    axious.get(`https://api.github.com/users/${userName}`)
+    return axious.get(`https://api.github.com/users/${userName}`)
     .then(function(response) {
         console.log(`User "${userName}" has been found!`);
-        //console.log(response);
-        console.log(response.data.bio);
         userBio = response.data.bio;
         userImg = response.data.avatar_url;
         userEmail = response.data.email;
     }).catch(function (error) {
-        inquirer.prompt([
-            {
-                type: `confirm`,
-                name: `attemptAgain`,
-                message: `User "${userName}" not found. Would you like to try to find another GitHub user?\n`
-            }
-        ]).then(({attemptAgain}) => {
-            if (attemptAgain === true) {
-                askUserInfo();
-            }
-            else {
-                return;
-            };
-        });
+        console.log(`User "${userName}" not found. Please try again.`);
+        process.exit(1);
     });
 
 };
@@ -58,121 +47,92 @@ function getProjectInfo() {
             .prompt([
                 {
                     type: `input`,
-                    message: `Project Title:\n`,
+                    message: `\n-------------------------------------------------\nProject Title:\n-------------------------------------------------\n`,
                     name: `projectTitle`
                 },
                 {
                     type: `input`,
-                    message: `Project Description (2-3 sentences):\n`,
+                    message: `\n-------------------------------------------------\nProject Description (2-3 sentences):\n-------------------------------------------------\n`,
                     name: `projectDescription`
                 },
                 {
                     type: `input`,
-                    message: `How is this project installed?\n`,
+                    message: `\n-------------------------------------------------\nHow is this project installed?\n-------------------------------------------------\n`,
                     name: `projectInstall`
                 },
                 {
                     type: `input`,
-                    message: `How is this project used?\n`,
+                    message: `\n-------------------------------------------------\nHow is this project used?\n-------------------------------------------------\n`,
                     name: `projectUsage` 
                 },
                 {
                     type:`list`,
                     name: `projectLicense`,
-                    message: `What is the License on your project?`,
+                    message: `\n-------------------------------------------------\nWhat is the License on your project?\n-------------------------------------------------\n`,
                     choices: [`None`, `Apache License 2.0`, `GNU General Public License v3.0`,`MIT License`, `BSD 2-Clause "Simplified" License`, `BSD 3-Clause "New" or "Revised" License`, `Creative Commons Zero v1.0 Universal`, `Eclipse Public License 2.0`, `GNU Affero General Public License v3.0`, `GNU General Public License v2.0`, `GNU Lesser General Public License v2.1`, `GNU Lesser General Public License v3.0`, `Mozilla Public License 2.0`, `The Unlicense`]
                     
                 },
-                {
-                    type: `input`,
-                    name: `projectTesting`,
-                    message: `Any testing you did that you woud like included in your readme.md?`
-                },
+                // {
+                //     type: `input`,
+                //     name: `projectTesting`,
+                //     message: `Any testing you did that you woud like included in your readme.md?`
+                // },
                 {
                     type: `input`,
                     name: `additionalCollab`,
-                    message: `Any other collaborators on your project?`
+                    message: `\n-------------------------------------------------\nAny other collaborators on your project?\n-------------------------------------------------\n`
                 }
             ]).then((answers) => {
-                console.log(answers);
+                repoInfo = answers;
+                fillReadme();
+            }).catch(() => {
+                console.log(`Something went wrong... please try again.`);
+                process.exit(1);
             })
     });    
 };
 
-askUserInfo();
+function fillReadme() {
+    readMe = `
+    # ${repoInfo.projectTitle}
+    
+    ${repoInfo.projectDescription}
+    
+    ## Table of Contents
+    
+    * [Installation](#installation)
+    * [Description](#description)
+    * [Usage](#usage)
+    * [License](#license)
+    * [Contributing](contributing)
+    * [Tests](tests)
+    * [Questions](questions)     
+    
+    ## Installation
+    
+    ${repoInfo.projectInstall}
+    
+    ## Usage
 
- `
- # Project Title
+    ${repoInfo.projectUsage}
+    
+    ## License
+    
+    ${repoInfo.projectLicense}
+    
+    ## Contributing
+    
+    ${repoInfo.additionalCollab}
 
-One Paragraph of project description goes here
+    ## Tests
+    
+    ${repoInfo.additionalCollab}
 
-## Getting Started
+    ## Questions
+    ${userBio}
+    ${userEmail}
+    ![Developer Photograph](${userImg})
+     `
+};
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
-
-### Prerequisites
-
-What things you need to install the software and how to install them
-
-
-
-### Installing
-
-A step by step series of examples that tell you how to get a development env running
-
-Say what the step will be
-
-
-And repeat
-
-
-End with an example of getting some data out of the system or using it for a little demo
-
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-
-### And coding style tests
-
-Explain what these tests test and why
-
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
-
-## Built With
-
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
-
-## Authors
-
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
- `
+askUserName().then(getUserInfo).then(getProjectInfo).then(generateReadme);
