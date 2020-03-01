@@ -83,6 +83,7 @@ function getProjectInfo() {
                     message: `\n-------------------------------------------------\nAny other collaborators on your project?\n-------------------------------------------------\n`
                 }
             ]).then((answers) => {
+                let answersBadge = answers.projectLicense.replace(/ /gi, `%20`);
                 return resolve(
                 readMe = 
 `# ${answers.projectTitle}
@@ -109,13 +110,9 @@ ${answers.projectUsage}
 
 ## License
 
-${answers.projectLicense}
+[![${answers.projectLicense}](https://img.shields.io/badge/License-${answersBadge}-green)]()
 
 ## Contributing
-
-${answers.additionalCollab}
-
-## Tests
 
 ${answers.additionalCollab}
 
@@ -132,7 +129,7 @@ ${userEmail}
 };
 
 function generateReadme() {
-    fs.writeFile("readme2.md", readMe, function (err) {
+    fs.writeFile("README.md", readMe, function (err) {
 
         if (err) {
             return console.log(err);
@@ -143,6 +140,4 @@ function generateReadme() {
     });
 }
 
-// askUserName().then(getUserInfo).then(getProjectInfo).then(generateReadme);
-
-getProjectInfo().then(generateReadme);
+askUserName().then(getUserInfo).then(getProjectInfo).then(generateReadme);
