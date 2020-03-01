@@ -31,7 +31,6 @@ function getUserInfo(userName) {
             userBio = response.data.bio;
             userImg = response.data.avatar_url;
             userEmail = response.data.email;
-            console.log(response);
         }).catch(function (error) {
             console.log(`\nUser "${userName}" not found. Please try again.\n`);
             process.exit(1);
