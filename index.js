@@ -7,7 +7,7 @@ let userBio;
 let userImg;
 let userEmail;
 let repoInfo;
-const readMe;
+let readMe;
 
 
 function askUserName() {
@@ -19,7 +19,7 @@ function askUserName() {
                     message: `\n-------------------------------------------------\nWhat is your GitHub user name?\n-------------------------------------------------\n`,
                     name: `githubUser`,
                 }
-            ]).then(({githubUser}) => {
+            ]).then(({ githubUser }) => {
                 return resolve(githubUser);
             });
     });
@@ -28,15 +28,15 @@ function askUserName() {
 function getUserInfo(userName) {
 
     return axious.get(`https://api.github.com/users/${userName}`)
-    .then(function(response) {
-        console.log(`User "${userName}" has been found!`);
-        userBio = response.data.bio;
-        userImg = response.data.avatar_url;
-        userEmail = response.data.email;
-    }).catch(function (error) {
-        console.log(`User "${userName}" not found. Please try again.`);
-        process.exit(1);
-    });
+        .then(function (response) {
+            console.log(`\nUser "${userName}" has been found!\n`);
+            userBio = response.data.bio;
+            userImg = response.data.avatar_url;
+            userEmail = response.data.email;
+        }).catch(function (error) {
+            console.log(`\nUser "${userName}" not found. Please try again.\n`);
+            process.exit(1);
+        });
 
 };
 
@@ -63,14 +63,14 @@ function getProjectInfo() {
                 {
                     type: `input`,
                     message: `\n-------------------------------------------------\nHow is this project used?\n-------------------------------------------------\n`,
-                    name: `projectUsage` 
+                    name: `projectUsage`
                 },
                 {
-                    type:`list`,
+                    type: `list`,
                     name: `projectLicense`,
                     message: `\n-------------------------------------------------\nWhat is the License on your project?\n-------------------------------------------------\n`,
-                    choices: [`None`, `Apache License 2.0`, `GNU General Public License v3.0`,`MIT License`, `BSD 2-Clause "Simplified" License`, `BSD 3-Clause "New" or "Revised" License`, `Creative Commons Zero v1.0 Universal`, `Eclipse Public License 2.0`, `GNU Affero General Public License v3.0`, `GNU General Public License v2.0`, `GNU Lesser General Public License v2.1`, `GNU Lesser General Public License v3.0`, `Mozilla Public License 2.0`, `The Unlicense`]
-                    
+                    choices: [`None`, `Apache License 2.0`, `GNU General Public License v3.0`, `MIT License`, `BSD 2-Clause "Simplified" License`, `BSD 3-Clause "New" or "Revised" License`, `Creative Commons Zero v1.0 Universal`, `Eclipse Public License 2.0`, `GNU Affero General Public License v3.0`, `GNU General Public License v2.0`, `GNU Lesser General Public License v2.1`, `GNU Lesser General Public License v3.0`, `Mozilla Public License 2.0`, `The Unlicense`]
+
                 },
                 // {
                 //     type: `input`,
@@ -83,56 +83,66 @@ function getProjectInfo() {
                     message: `\n-------------------------------------------------\nAny other collaborators on your project?\n-------------------------------------------------\n`
                 }
             ]).then((answers) => {
-                repoInfo = answers;
-                fillReadme();
-            }).catch(() => {
-                console.log(`Something went wrong... please try again.`);
+                return resolve(
+                readMe = 
+`# ${answers.projectTitle}
+    
+${answers.projectDescription}
+    
+## Table of Contents
+    
+* [Installation](#installation)
+* [Description](#description)
+* [Usage](#usage)
+* [License](#license)
+* [Contributing](contributing)
+* [Tests](tests)
+* [Questions](questions)     
+
+## Installation
+
+${answers.projectInstall}
+
+## Usage
+
+${answers.projectUsage}
+
+## License
+
+${answers.projectLicense}
+
+## Contributing
+
+${answers.additionalCollab}
+
+## Tests
+
+${answers.additionalCollab}
+
+## Questions
+${userBio}
+${userEmail}
+![Developer Photograph](${userImg})
+    `
+            )}).catch(() => {
+                console.log(`\nSomething went wrong... please try again.\n`);
                 process.exit(1);
             })
-    });    
+    });
 };
 
-function fillReadme() {
-    readMe = `
-    # ${repoInfo.projectTitle}
-    
-    ${repoInfo.projectDescription}
-    
-    ## Table of Contents
-    
-    * [Installation](#installation)
-    * [Description](#description)
-    * [Usage](#usage)
-    * [License](#license)
-    * [Contributing](contributing)
-    * [Tests](tests)
-    * [Questions](questions)     
-    
-    ## Installation
-    
-    ${repoInfo.projectInstall}
-    
-    ## Usage
+function generateReadme() {
+    fs.writeFile("readme2.md", readMe, function (err) {
 
-    ${repoInfo.projectUsage}
-    
-    ## License
-    
-    ${repoInfo.projectLicense}
-    
-    ## Contributing
-    
-    ${repoInfo.additionalCollab}
+        if (err) {
+            return console.log(err);
+        }
 
-    ## Tests
-    
-    ${repoInfo.additionalCollab}
+        console.log(`\nYour readme.md file is now ready!\n`);
 
-    ## Questions
-    ${userBio}
-    ${userEmail}
-    ![Developer Photograph](${userImg})
-     `
-};
+    });
+}
 
-askUserName().then(getUserInfo).then(getProjectInfo).then(generateReadme);
+// askUserName().then(getUserInfo).then(getProjectInfo).then(generateReadme);
+
+getProjectInfo().then(generateReadme);
