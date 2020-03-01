@@ -91,12 +91,10 @@ ${answers.projectDescription}
 ## Table of Contents
     
 * [Installation](#installation)
-* [Description](#description)
 * [Usage](#usage)
 * [License](#license)
-* [Contributing](contributing)
-* [Tests](tests)
-* [Questions](questions)     
+* [Contributing](#contributing)
+* [Questions](#questions)     
 
 ## Installation
 
